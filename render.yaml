@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: cliniai
+    env: node
+    rootDir: cliniai
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # As variáveis do seu arquivo .env devem ser adicionadas no painel do Render
+      # ou definidas aqui se não forem sensíveis.
