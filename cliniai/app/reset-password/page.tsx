@@ -42,8 +42,8 @@ export default async function ResetPasswordPage({ searchParams }: Props) {
       </section>
 
       <section className="auth-card" aria-labelledby="reset-title">
-        <div className="auth-icon">
-          <LockKeyhole size={20} />
+        <div className="auth-icon red">
+          <LockKeyhole size={20} color="#dc2626" />
         </div>
         <h2 id="reset-title">Nova Senha</h2>
         <p>Defina a nova senha para sua conta.</p>

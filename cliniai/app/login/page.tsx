@@ -16,7 +16,7 @@ export default async function LoginPage() {
         <div className="auth-feature"><Activity size={18} /> Visão operacional em tempo real</div>
       </section>
       <section className="auth-card" aria-labelledby="login-title">
-        <div className="auth-icon"><LockKeyhole size={20} /></div>
+        <div className="auth-icon red"><LockKeyhole size={20} color="#dc2626" /></div>
         <h2 id="login-title">Boas-vindas</h2>
         <p>Acesse a operação da sua clínica.</p>
         <LoginForm />
