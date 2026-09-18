@@ -224,6 +224,46 @@ export function ReportsView({ data }: { data: ClinicalAnalyticsSummary }) {
         </div>
       </header>
 
+      {/* Banner de Boas-vindas para Clínicas Recém-Criadas */}
+      {data.activePatientCount === 0 && data.noShowMetrics.totalAppointments === 0 && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "14px",
+            padding: "16px 20px",
+            background: "linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%)",
+            border: "1px solid #bbf7d0",
+            borderRadius: "12px",
+            marginBottom: "22px",
+            boxShadow: "0 4px 14px rgba(34, 197, 94, 0.08)",
+          }}
+        >
+          <span
+            style={{
+              width: "36px",
+              height: "36px",
+              borderRadius: "10px",
+              background: "#16a34a",
+              color: "#ffffff",
+              display: "grid",
+              placeItems: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Sparkles size={20} />
+          </span>
+          <div>
+            <strong style={{ fontSize: "14px", color: "#14532d", display: "block", marginBottom: "3px" }}>
+              Bem-vinda à {data.organizationName}! Esta é a sua central de Inteligência Preditiva.
+            </strong>
+            <p style={{ margin: 0, fontSize: "12px", color: "#166534", lineHeight: 1.5 }}>
+              Sua clínica foi criada com sucesso e está com os dados 100% isolados. Conforme você cadastrar seus primeiros pacientes na aba <strong>Pacientes</strong> e agendar consultas na <strong>Agenda</strong>, os modelos de Inteligência Artificial, a projeção de faturamento, a análise de Pareto e o mapa de calor térmico começarão a gerar análises preditivas em tempo real para a sua gestão.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 4 Scorecards Executivos */}
       <section className="metrics-grid" style={{ marginBottom: "22px" }}>
         {/* Receita Projetada */}
@@ -595,45 +635,56 @@ export function ReportsView({ data }: { data: ClinicalAnalyticsSummary }) {
             </p>
           </div>
 
-          <div style={{ display: "grid", gap: "9px" }}>
-            {data.paretoServices.map((s, idx) => (
-              <div
-                key={s.name}
-                style={{
-                  padding: "9px 11px",
-                  background: idx < 2 ? "#eff6ff" : "#f8fafc",
-                  border: idx < 2 ? "1px solid #bfdbfe" : "1px solid #edf2f7",
-                  borderRadius: "8px",
-                  fontSize: "11px",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-                  <span style={{ color: "#1e293b", fontWeight: 700 }}>
-                    {idx + 1}. {s.name}
-                  </span>
-                  <strong style={{ color: idx < 2 ? "#1d4ed8" : "#475569" }}>
-                    {currency.format(s.revenue)}
-                  </strong>
-                </div>
-
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <div style={{ flex: 1, height: "6px", background: "#e2e8f0", borderRadius: "99px", overflow: "hidden" }}>
-                    <div
-                      style={{
-                        width: `${s.percentage * 2}%`,
-                        height: "100%",
-                        background: idx < 2 ? "linear-gradient(90deg, #3b82f6, #1d4ed8)" : "#94a3b8",
-                        borderRadius: "99px",
-                      }}
-                    />
+          {data.paretoServices.length === 0 ? (
+            <div style={{ padding: "30px 14px", textAlign: "center", color: "#64748b", background: "#f8fafc", borderRadius: "8px", border: "1px dashed #cbd5e1" }}>
+              <p style={{ margin: "0 0 4px", fontSize: "12px", fontWeight: 700, color: "#334155" }}>
+                Nenhum procedimento faturado ainda
+              </p>
+              <p style={{ margin: 0, fontSize: "11px", color: "#94a3b8" }}>
+                Conforme as consultas forem realizadas, os procedimentos de maior impacto financeiro aparecerão aqui.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gap: "9px" }}>
+              {data.paretoServices.map((s, idx) => (
+                <div
+                  key={s.name}
+                  style={{
+                    padding: "9px 11px",
+                    background: idx < 2 ? "#eff6ff" : "#f8fafc",
+                    border: idx < 2 ? "1px solid #bfdbfe" : "1px solid #edf2f7",
+                    borderRadius: "8px",
+                    fontSize: "11px",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                    <span style={{ color: "#1e293b", fontWeight: 700 }}>
+                      {idx + 1}. {s.name}
+                    </span>
+                    <strong style={{ color: idx < 2 ? "#1d4ed8" : "#475569" }}>
+                      {currency.format(s.revenue)}
+                    </strong>
                   </div>
-                  <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 600, minWidth: "55px", textAlign: "right" }}>
-                    {s.percentage}% ({s.cumulativePercentage}% acum.)
-                  </span>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <div style={{ flex: 1, height: "6px", background: "#e2e8f0", borderRadius: "99px", overflow: "hidden" }}>
+                      <div
+                        style={{
+                          width: `${s.percentage * 2}%`,
+                          height: "100%",
+                          background: idx < 2 ? "linear-gradient(90deg, #3b82f6, #1d4ed8)" : "#94a3b8",
+                          borderRadius: "99px",
+                        }}
+                      />
+                    </div>
+                    <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 600, minWidth: "55px", textAlign: "right" }}>
+                      {s.percentage}% ({s.cumulativePercentage}% acum.)
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
 
@@ -650,28 +701,39 @@ export function ReportsView({ data }: { data: ClinicalAnalyticsSummary }) {
             </p>
           </div>
 
-          <div style={{ display: "grid", gap: "9px" }}>
-            {data.demographics.ageGroups.map((g) => (
-              <div key={g.label}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "3px" }}>
-                  <span style={{ color: "#334155", fontWeight: 600 }}>{g.label} anos</span>
-                  <strong style={{ color: "#0f172a" }}>
-                    {g.count} pacientes ({g.percentage}%)
-                  </strong>
+          {data.activePatientCount === 0 ? (
+            <div style={{ padding: "30px 14px", textAlign: "center", color: "#64748b", background: "#f8fafc", borderRadius: "8px", border: "1px dashed #cbd5e1" }}>
+              <p style={{ margin: "0 0 4px", fontSize: "12px", fontWeight: 700, color: "#334155" }}>
+                Nenhum paciente cadastrado ainda
+              </p>
+              <p style={{ margin: 0, fontSize: "11px", color: "#94a3b8" }}>
+                Cadastre seus primeiros pacientes na aba Pacientes para visualizar a pirâmide etária da sua clínica.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gap: "9px" }}>
+              {data.demographics.ageGroups.map((g) => (
+                <div key={g.label}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "3px" }}>
+                    <span style={{ color: "#334155", fontWeight: 600 }}>{g.label} anos</span>
+                    <strong style={{ color: "#0f172a" }}>
+                      {g.count} pacientes ({g.percentage}%)
+                    </strong>
+                  </div>
+                  <div style={{ width: "100%", height: "8px", background: "#f1f5f9", borderRadius: "99px", overflow: "hidden" }}>
+                    <div
+                      style={{
+                        width: `${Math.max(4, g.percentage)}%`,
+                        height: "100%",
+                        background: "linear-gradient(90deg, #60a5fa, #2563eb)",
+                        borderRadius: "99px",
+                      }}
+                    />
+                  </div>
                 </div>
-                <div style={{ width: "100%", height: "8px", background: "#f1f5f9", borderRadius: "99px", overflow: "hidden" }}>
-                  <div
-                    style={{
-                      width: `${Math.max(4, g.percentage)}%`,
-                      height: "100%",
-                      background: "linear-gradient(90deg, #60a5fa, #2563eb)",
-                      borderRadius: "99px",
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Matriz de Convênios vs Particular */}
@@ -685,28 +747,39 @@ export function ReportsView({ data }: { data: ClinicalAnalyticsSummary }) {
             </p>
           </div>
 
-          <div style={{ display: "grid", gap: "9px" }}>
-            {data.demographics.insurances.map((ins) => (
-              <div key={ins.name}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "3px" }}>
-                  <span style={{ color: "#334155", fontWeight: 600 }}>{ins.name}</span>
-                  <strong style={{ color: "#0f172a" }}>
-                    {ins.count} atendimentos ({ins.percentage}%)
-                  </strong>
+          {data.demographics.insurances.length === 0 ? (
+            <div style={{ padding: "30px 14px", textAlign: "center", color: "#64748b", background: "#f8fafc", borderRadius: "8px", border: "1px dashed #cbd5e1" }}>
+              <p style={{ margin: "0 0 4px", fontSize: "12px", fontWeight: 700, color: "#334155" }}>
+                Sem convênios registrados
+              </p>
+              <p style={{ margin: 0, fontSize: "11px", color: "#94a3b8" }}>
+                A divisão entre consultas particulares e convênios aparecerá assim que os atendimentos forem registrados.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gap: "9px" }}>
+              {data.demographics.insurances.map((ins) => (
+                <div key={ins.name}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "3px" }}>
+                    <span style={{ color: "#334155", fontWeight: 600 }}>{ins.name}</span>
+                    <strong style={{ color: "#0f172a" }}>
+                      {ins.count} atendimentos ({ins.percentage}%)
+                    </strong>
+                  </div>
+                  <div style={{ width: "100%", height: "8px", background: "#f1f5f9", borderRadius: "99px", overflow: "hidden" }}>
+                    <div
+                      style={{
+                        width: `${Math.max(4, ins.percentage)}%`,
+                        height: "100%",
+                        background: ins.name === "Particular" ? "linear-gradient(90deg, #10b981, #059669)" : "linear-gradient(90deg, #818cf8, #4f46e5)",
+                        borderRadius: "99px",
+                      }}
+                    />
+                  </div>
                 </div>
-                <div style={{ width: "100%", height: "8px", background: "#f1f5f9", borderRadius: "99px", overflow: "hidden" }}>
-                  <div
-                    style={{
-                      width: `${Math.max(4, ins.percentage)}%`,
-                      height: "100%",
-                      background: ins.name === "Particular" ? "linear-gradient(90deg, #10b981, #059669)" : "linear-gradient(90deg, #818cf8, #4f46e5)",
-                      borderRadius: "99px",
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </main>

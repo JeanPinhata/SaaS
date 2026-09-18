@@ -183,8 +183,13 @@ export async function getClinicalAnalytics(
     }
   }
 
-  // Fallback para demo-store se banco vazio ou offline
-  if (rawAppointments.length === 0 && rawPatients.length === 0) {
+  const isDemoTenant =
+    context.organizationId === demoDatabase.organization.id ||
+    context.organizationId === "org_clinica_vida" ||
+    context.organizationId === "922a8e06-b717-4ee7-a4ce-5b34e59a809e";
+
+  // Fallback para demo-store SOMENTE para o tenant de demonstração (Clínica Vida)
+  if (isDemoTenant && rawAppointments.length === 0 && rawPatients.length === 0) {
     const demoOrg = (demoDatabase as any).organizations?.find((o: any) => o.id === context.organizationId) ||
       (context.organizationId === demoDatabase.organization.id ? demoDatabase.organization : null);
     if (demoOrg) orgName = demoOrg.name;
@@ -214,6 +219,72 @@ export async function getClinicalAnalytics(
     rawServices = demoDatabase.services
       .filter((s) => s.organizationId === context.organizationId)
       .map((s) => ({ name: s.name, price: s.price }));
+  }
+
+  // Se for uma clínica real recém-criada (sem consultas ou pacientes), retorna estado real zerado
+  if (!isDemoTenant && rawAppointments.length === 0 && rawPatients.length === 0) {
+    const hours = [8, 9, 10, 11, 13, 14, 15, 16, 17, 18];
+    const days = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+    const cells: HeatmapCell[] = [];
+    for (let d = 1; d <= 6; d++) {
+      for (const h of hours) {
+        cells.push({ dayOfWeek: d, hour: h, occupancyRate: 0, appointmentCount: 0 });
+      }
+    }
+
+    return {
+      period,
+      generatedAt: new Date().toISOString(),
+      organizationName: orgName,
+      totalRevenue: 0,
+      projectedRevenue: 0,
+      revenueGrowthRate: 0,
+      patientLtv: 0,
+      patientRetentionRate: 0,
+      activePatientCount: 0,
+      noShowMetrics: {
+        overallRiskRate: 0,
+        riskLevel: "LOW",
+        estimatedRevenueLoss: 0,
+        confirmedAppointments: 0,
+        noShowAppointments: 0,
+        totalAppointments: 0,
+        topRiskFactors: [
+          { factor: "Aguardando primeiros agendamentos", impact: "A IA começará a prever faltas", weight: 0 },
+        ],
+        prescriptiveRecommendation:
+          "Sua clínica é nova! Conforme você cadastrar seus primeiros pacientes e agendamentos, o modelo de Inteligência Artificial começará a calcular os riscos de faltas e emitir alertas automáticos.",
+      },
+      occupancyHeatmap: {
+        hours,
+        days,
+        cells,
+        peakHour: "Aguardando agendamentos",
+        lowestHour: "Aguardando agendamentos",
+        averageOccupancy: 0,
+      },
+      revenueForecast: [
+        { date: "Semana -3", actual: 0 },
+        { date: "Semana -2", actual: 0 },
+        { date: "Semana -1", actual: 0 },
+        { date: "Atual", actual: 0, forecast: 0, lowerBound: 0, upperBound: 0 },
+        { date: "+1 Sem", forecast: 0, lowerBound: 0, upperBound: 0 },
+        { date: "+2 Sem", forecast: 0, lowerBound: 0, upperBound: 0 },
+        { date: "+3 Sem", forecast: 0, lowerBound: 0, upperBound: 0 },
+        { date: "+4 Sem", forecast: 0, lowerBound: 0, upperBound: 0 },
+      ],
+      paretoServices: [],
+      demographics: {
+        ageGroups: [
+          { label: "< 18", count: 0, percentage: 0 },
+          { label: "18 - 35", count: 0, percentage: 0 },
+          { label: "36 - 50", count: 0, percentage: 0 },
+          { label: "51 - 65", count: 0, percentage: 0 },
+          { label: "65+", count: 0, percentage: 0 },
+        ],
+        insurances: [],
+      },
+    };
   }
 
   // 1. Métrica de No-Show com Scoring Probabilístico
