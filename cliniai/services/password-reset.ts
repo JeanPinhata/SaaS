@@ -82,14 +82,30 @@ export async function requestPasswordReset(email: string): Promise<ResetRequestR
   const relativeLink = `/reset-password?token=${rawToken}`;
   console.log(`🔑 [CliniAI] Link de recuperação gerado para ${userName} (${normalizedEmail}): ${relativeLink}`);
 
+function getAppBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+  }
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  if (process.env.RENDER_EXTERNAL_URL) {
+    return process.env.RENDER_EXTERNAL_URL.replace(/\/$/, "");
+  }
+  return "http://localhost:3000";
+}
+
   // Se houver RESEND_API_KEY no ambiente, envia e-mail real
   if (process.env.RESEND_API_KEY) {
     try {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
+      const appUrl = getAppBaseUrl();
       const fullLink = `${appUrl}${relativeLink}`;
 
       const sender = process.env.RESEND_FROM || "CliniAI <onboarding@resend.dev>";
-      await fetch("https://api.resend.com/emails", {
+      const resendRes = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
@@ -110,10 +126,19 @@ export async function requestPasswordReset(email: string): Promise<ResetRequestR
                 </a>
               </p>
               <p style="font-size: 12px; color: #64748b;">Este link é válido por 30 minutos. Se você não solicitou esta alteração, ignore este e-mail.</p>
+              <p style="font-size: 11px; color: #94a3b8; margin-top: 15px;">Link direto: <a href="${fullLink}">${fullLink}</a></p>
             </div>
           `,
         }),
       });
+
+      if (!resendRes.ok) {
+        const errorData = await resendRes.json().catch(() => ({}));
+        console.error("❌ [Resend] Erro ao enviar e-mail:", resendRes.status, errorData);
+      } else {
+        const data = await resendRes.json().catch(() => ({}));
+        console.log("✅ [Resend] E-mail enviado com sucesso. ID:", data.id);
+      }
     } catch (emailErr) {
       console.error("Erro ao enviar e-mail de recuperação via Resend:", emailErr);
     }
