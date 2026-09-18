@@ -88,6 +88,7 @@ export async function requestPasswordReset(email: string): Promise<ResetRequestR
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
       const fullLink = `${appUrl}${relativeLink}`;
 
+      const sender = process.env.RESEND_FROM || "CliniAI <onboarding@resend.dev>";
       await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -95,7 +96,7 @@ export async function requestPasswordReset(email: string): Promise<ResetRequestR
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "CliniAI <nao-responda@cliniai.com.br>",
+          from: sender,
           to: [normalizedEmail],
           subject: "Redefinição de Senha - CliniAI",
           html: `
