@@ -39,6 +39,8 @@ export type DemoAppointment = TenantRecord & {
 
 export type DashboardData = {
   userName: string;
+  userFullName?: string;
+  userRole?: string;
   organizationName: string;
   appointmentCount: number;
   confirmedCount: number;

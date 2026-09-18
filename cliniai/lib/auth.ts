@@ -13,7 +13,13 @@ const sessionCookie = "cliniai_session";
 const getSecret = () =>
   new TextEncoder().encode(process.env.AUTH_SECRET ?? "development-only-cliniai-session-secret-change-before-production");
 
-export type Session = { userId: string; organizationId: string; role: Role; name: string };
+export type Session = {
+  userId: string;
+  organizationId: string;
+  role: Role;
+  name: string;
+  organizationName?: string;
+};
 
 export async function authenticate(email: string, password: string): Promise<Session | null> {
   const pool = getDbPool();
@@ -34,6 +40,7 @@ export async function authenticate(email: string, password: string): Promise<Ses
               organizationId: mem.organization_id,
               role: mem.role as Role,
               name: user.name,
+              organizationName: mem.org_name,
             };
           }
         }
@@ -50,7 +57,16 @@ export async function authenticate(email: string, password: string): Promise<Ses
   const membership = demoDatabase.memberships.find((candidate) => candidate.userId === user.id);
   if (!membership) return null;
 
-  return { userId: user.id, organizationId: membership.organizationId, role: membership.role, name: user.name };
+  const demoOrg = (demoDatabase as any).organizations?.find((o: any) => o.id === membership.organizationId) ||
+    (membership.organizationId === demoDatabase.organization.id ? demoDatabase.organization : null);
+
+  return {
+    userId: user.id,
+    organizationId: membership.organizationId,
+    role: membership.role,
+    name: user.name,
+    organizationName: demoOrg?.name || demoDatabase.organization.name,
+  };
 }
 
 export async function registerTenant(input: {
@@ -99,12 +115,15 @@ export async function registerTenant(input: {
   // Sincroniza em memória para caso a demo store seja consultada em dev
   demoDatabase.users.push({ id: userId, name: input.name, email, passwordHash });
   demoDatabase.memberships.push({ id: membershipId, organizationId: orgId, userId, role: "OWNER" });
+  (demoDatabase as any).organizations = (demoDatabase as any).organizations || [];
+  (demoDatabase as any).organizations.push({ id: orgId, name: input.clinicName, slug });
 
   const session: Session = {
     userId,
     organizationId: orgId,
     role: "OWNER",
     name: input.name,
+    organizationName: input.clinicName,
   };
 
   await createSession(session);
@@ -139,11 +158,35 @@ export async function getSession(): Promise<Session | null> {
       typeof payload.name !== "string"
     )
       return null;
+
+    let orgName = typeof payload.organizationName === "string" ? payload.organizationName : undefined;
+
+    // Se o cookie não tem o nome gravado (sessão anterior), consulta o banco ou demo
+    if (!orgName) {
+      const pool = getDbPool();
+      if (pool) {
+        try {
+          const res = await pool.query("SELECT name FROM organizations WHERE id = $1", [payload.organizationId]);
+          if (res.rows.length > 0) {
+            orgName = res.rows[0].name;
+          }
+        } catch {
+          // ignore error
+        }
+      }
+      if (!orgName) {
+        const demoOrg = (demoDatabase as any).organizations?.find((o: any) => o.id === payload.organizationId) ||
+          (payload.organizationId === demoDatabase.organization.id ? demoDatabase.organization : null);
+        orgName = demoOrg?.name || "Minha Clínica";
+      }
+    }
+
     return {
       userId: payload.userId,
       organizationId: payload.organizationId,
       role: payload.role as Role,
       name: payload.name,
+      organizationName: orgName,
     };
   } catch {
     return null;
