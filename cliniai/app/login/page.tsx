@@ -1,4 +1,5 @@
 import { Activity, HeartPulse, LockKeyhole } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/login-form";
 import { getSession } from "@/lib/auth";
@@ -19,6 +20,12 @@ export default async function LoginPage() {
         <h2 id="login-title">Boas-vindas</h2>
         <p>Acesse a operação da sua clínica.</p>
         <LoginForm />
+        <div style={{ marginTop: "18px", textAlign: "center", fontSize: "12px", color: "#61768c" }}>
+          Ainda não tem conta?{" "}
+          <Link href="/register" style={{ color: "#2577f4", fontWeight: 700, textDecoration: "none" }}>
+            Cadastrar minha clínica
+          </Link>
+        </div>
         <aside className="demo-credentials">
           <strong>Ambiente de demonstração</strong>
           <span>admin@cliniai.demo · CliniAI!2026</span>
@@ -27,3 +34,4 @@ export default async function LoginPage() {
     </main>
   );
 }
+

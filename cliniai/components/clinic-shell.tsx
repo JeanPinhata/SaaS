@@ -4,5 +4,7 @@ import { requireOrganizationContext } from "@/lib/auth";
 
 export async function ClinicShell({ active, children }: { active: string; children: React.ReactNode }) {
   const context = await requireOrganizationContext();
-  return <div className="app-shell"><AppSidebar organizationName={demoDatabase.organization.name} userName={context.name} active={active} />{children}</div>;
+  const orgName = (context as any).organizationName || demoDatabase.organization.name;
+  return <div className="app-shell"><AppSidebar organizationName={orgName} userName={context.name} active={active} />{children}</div>;
 }
+

@@ -13,7 +13,7 @@
 - [x] Autenticação com cookies assinados, validação com Zod, contexto de organização e perfis de acesso (roles).
 - [x] Limite de repositório com escopo de tenant e testes de proteção contra acesso entre organizações (cross-tenant).
 - [x] Layout principal responsivo, tokens de design e dashboard calculado a partir dos dados do repositório de demonstração.
-- [ ] Substituir o adaptador de demonstração pelo runtime PostgreSQL local ou gerenciado (requer uma `DATABASE_URL`).
+- [x] Substituir o adaptador de demonstração pelo runtime PostgreSQL local ou gerenciado (requer uma `DATABASE_URL`).
 
 ## Fase 2 — Cadastros e Prontuários (concluída)
 
@@ -21,7 +21,8 @@
 - [x] Catálogos de profissionais, especialidades, serviços e salas com criação e validações no servidor com escopo de tenant.
 - [x] Estados responsivos para listas vazias, sucesso e validações/erros.
 - [x] Completar os controles de edição/ativação/inativação para os catálogos operacionais.
-- [ ] Persistir as gravações da Fase 2 através do adaptador PostgreSQL configurado.
+- [x] Persistir as gravações da Fase 2 através do adaptador PostgreSQL configurado.
+
 
 ## Fase 3 — Agendamento (em andamento)
 
