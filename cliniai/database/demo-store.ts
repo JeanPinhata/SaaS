@@ -103,6 +103,7 @@ export const demoDatabase = {
   expenses: initialExpenses,
   waitingList: ["Rafaela Torres", "Henrique Costa", "Mariana Lopes", "Diego Souza", "Paula Nunes", "Luiz Rocha", "Cecília Alves"],
   weeklyRevenue: [1820, 2360, 2100, 2980, 2420, 1800, 3840],
+  passwordResetTokens: [] as Array<{ id: string; userId: string; tokenHash: string; expiresAt: Date; usedAt?: Date }>,
 };
 
 export function todayInSaoPaulo() {

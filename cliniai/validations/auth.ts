@@ -12,4 +12,17 @@ export const RegisterTenantSchema = z.object({
   password: z.string().min(8, "A senha precisa ter pelo menos 8 caracteres.").max(100),
   phone: z.string().trim().optional(),
 });
+export const ForgotPasswordSchema = z.object({
+  email: z.string().trim().email("Informe um e-mail válido."),
+});
 
+export const ResetPasswordSchema = z
+  .object({
+    token: z.string().min(10, "Token de recuperação inválido."),
+    password: z.string().min(8, "A senha precisa ter pelo menos 8 caracteres.").max(100),
+    confirmPassword: z.string().min(8, "Confirme sua senha."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
+  });

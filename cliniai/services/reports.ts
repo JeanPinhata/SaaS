@@ -417,14 +417,15 @@ export async function getClinicalAnalytics(
 
   const totalServiceRev = sortedServices.reduce((acc, curr) => acc + curr.revenue, 0) || 1;
   let runningCum = 0;
-  const paretoServices: ParetoItem[] = sortedServices.map((s) => {
+  const paretoServices: ParetoItem[] = sortedServices.map((s, idx) => {
     const pct = Math.round((s.revenue / totalServiceRev) * 1000) / 10;
     runningCum += pct;
+    const isLast = idx === sortedServices.length - 1;
     return {
       name: s.name,
       revenue: s.revenue,
       percentage: pct,
-      cumulativePercentage: Math.min(100, Math.round(runningCum * 10) / 10),
+      cumulativePercentage: isLast ? 100 : Math.min(100, Math.round(runningCum * 10) / 10),
     };
   });
 

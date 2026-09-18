@@ -41,13 +41,45 @@ async function runMigration() {
     const versionRes = await client.query("SELECT version();");
     console.log("📌 Versão do Banco:", versionRes.rows[0].version.split(",")[0]);
 
-    const migrationFile = path.join(process.cwd(), "database", "migrations", "0001_foundation.sql");
-    console.log("📄 Lendo migration:", migrationFile);
-    const sql = fs.readFileSync(migrationFile, "utf-8");
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS _migrations (
+        name text PRIMARY KEY,
+        applied_at timestamptz NOT NULL DEFAULT now()
+      );
+    `);
 
-    console.log("🚀 Executando migração 0001_foundation.sql no Supabase...");
-    await client.query(sql);
-    console.log("🎉 Migração executada com sucesso!");
+    // Verifica se 0001_foundation já foi executada no passado verificando a tabela organizations
+    const orgCheck = await client.query(`
+      SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'organizations';
+    `);
+    if (orgCheck.rows.length > 0) {
+      await client.query(`
+        INSERT INTO _migrations (name) VALUES ('0001_foundation.sql') ON CONFLICT (name) DO NOTHING;
+      `);
+    }
+
+    const appliedRes = await client.query(`SELECT name FROM _migrations;`);
+    const appliedSet = new Set(appliedRes.rows.map((r) => r.name));
+
+    const migrationsDir = path.join(process.cwd(), "database", "migrations");
+    const migrationFiles = fs
+      .readdirSync(migrationsDir)
+      .filter((file) => file.endsWith(".sql"))
+      .sort();
+
+    for (const file of migrationFiles) {
+      if (appliedSet.has(file)) {
+        console.log(`⏩ Migração ${file} já aplicada anteriormente. Pulando.`);
+        continue;
+      }
+
+      const fullPath = path.join(migrationsDir, file);
+      console.log(`🚀 Executando migração ${file} no Supabase...`);
+      const sql = fs.readFileSync(fullPath, "utf-8");
+      await client.query(sql);
+      await client.query(`INSERT INTO _migrations (name) VALUES ($1);`, [file]);
+      console.log(`✅ Migração ${file} concluída com sucesso!`);
+    }
 
     const tablesRes = await client.query(`
       SELECT table_name 
