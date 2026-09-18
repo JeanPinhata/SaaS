@@ -1,7 +1,8 @@
-import type { DemoAppointment, Patient, Professional, Role, Room, Service, Specialty } from "@/lib/types";
+import type { DemoAppointment, Expense, Patient, Payment, Professional, Role, Room, Service, Specialty } from "@/lib/types";
 
 const organizationId = "org_clinica_vida";
 const demoPasswordHash = "$2b$12$/eeVDwstB83AhLH5U8S78uovEMbROPprHQAWmubmXbBV9zOtsHgFi";
+
 
 function saoPauloDate(offset = 0) {
   const now = new Date();
@@ -66,6 +67,28 @@ const rooms: Room[] = [
   { id: "room_3", organizationId, name: "Sala de procedimento", description: "Procedimentos ambulatoriais", status: "ACTIVE" },
 ];
 
+const initialPayments: Payment[] = appointments.slice(0, 20).map((apt, idx) => ({
+  id: `pay_${idx + 1}`,
+  organizationId,
+  patientId: apt.patientId ?? `patient_${idx + 1}`,
+  patientName: apt.patientName,
+  appointmentId: apt.id,
+  amount: apt.expectedAmount > 0 ? apt.expectedAmount : 160,
+  status: idx % 4 === 0 ? "PENDING" : "PAID",
+  paymentMethod: idx % 3 === 0 ? "PIX" : idx % 3 === 1 ? "Cartão de Crédito" : "Dinheiro",
+  paidAt: idx % 4 === 0 ? undefined : apt.startsAt,
+  createdAt: apt.startsAt,
+  notes: idx % 4 === 0 ? "Aguardando confirmação na recepção" : "Recebido na recepção",
+}));
+
+const initialExpenses: Expense[] = [
+  { id: "exp_1", organizationId, description: "Aluguel do Imóvel Clínico", category: "Infraestrutura", amount: 3500, dueDate: `${saoPauloDate().slice(0, 7)}-10`, paidAt: `${saoPauloDate().slice(0, 7)}-10T10:00:00-03:00`, createdAt: "2025-05-01T08:00:00.000Z" },
+  { id: "exp_2", organizationId, description: "Energia Elétrica e Água", category: "Utilidades", amount: 620.50, dueDate: `${saoPauloDate().slice(0, 7)}-15`, paidAt: `${saoPauloDate().slice(0, 7)}-15T14:30:00-03:00`, createdAt: "2025-05-01T08:00:00.000Z" },
+  { id: "exp_3", organizationId, description: "Insumos e Descartáveis Médicos", category: "Material Clínico", amount: 1140.00, dueDate: `${saoPauloDate().slice(0, 7)}-20`, createdAt: "2025-05-02T09:00:00.000Z" },
+  { id: "exp_4", organizationId, description: "Internet Fibra e Telefonia", category: "Telecom", amount: 280.00, dueDate: `${saoPauloDate().slice(0, 7)}-22`, paidAt: `${saoPauloDate().slice(0, 7)}-22T11:00:00-03:00`, createdAt: "2025-05-02T09:00:00.000Z" },
+  { id: "exp_5", organizationId, description: "Licença Software e Infraestrutura", category: "Tecnologia", amount: 350.00, dueDate: `${saoPauloDate().slice(0, 7)}-28`, createdAt: "2025-05-03T10:00:00.000Z" },
+];
+
 export const demoDatabase = {
   organization: { id: organizationId, name: "Clínica Vida", slug: "clinica-vida", timezone: "America/Sao_Paulo" },
   users: [{ id: "user_ana_souza", name: "Ana Souza", email: "admin@cliniai.demo", passwordHash: demoPasswordHash }],
@@ -76,6 +99,8 @@ export const demoDatabase = {
   services,
   rooms,
   appointments,
+  payments: initialPayments,
+  expenses: initialExpenses,
   waitingList: ["Rafaela Torres", "Henrique Costa", "Mariana Lopes", "Diego Souza", "Paula Nunes", "Luiz Rocha", "Cecília Alves"],
   weeklyRevenue: [1820, 2360, 2100, 2980, 2420, 1800, 3840],
 };
@@ -83,3 +108,4 @@ export const demoDatabase = {
 export function todayInSaoPaulo() {
   return saoPauloDate();
 }
+

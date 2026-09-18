@@ -1,54 +1,60 @@
-# Implementation plan
+# Plano de Implementação
 
-## Discovery completed
+## Descoberta Concluída
 
-- The supplied workspace did not contain an existing application or stack; only project instructions and synced reference material were present.
-- The provided reference establishes a premium medical SaaS interface: dark left rail, light workspace, dense operational cards, restrained blue actions, and semantic appointment states.
-- The requested architecture is a modular monolith with PostgreSQL, server-side tenancy and TypeScript strict mode.
+- O espaço de trabalho fornecido não continha uma aplicação ou stack existente; apenas instruções de projeto e materiais de referência sincronizados estavam presentes.
+- A referência fornecida estabelece uma interface premium para SaaS médico: barra lateral escura à esquerda, área de trabalho clara, cards operacionais densos, ações em tons de azul comedidos e status semânticos para agendamentos.
+- A arquitetura definida é um monólito modular com PostgreSQL, multi-tenancy no lado do servidor e TypeScript em modo estrito (strict mode).
 
-## Phase 1 — Foundation (current delivery)
+## Fase 1 — Fundação (entrega atual)
 
-- [x] Next.js + React + TypeScript strict + Tailwind project scaffold.
-- [x] PostgreSQL schema migration and realistic, fictional seed definition.
-- [x] Signed cookie authentication, Zod validation, role and organization context.
-- [x] Tenant-scoped repository boundary and cross-tenant guard tests.
-- [x] Responsive main layout, design tokens and dashboard calculated from demo repository data.
-- [ ] Replace demo adapter with the selected managed/local PostgreSQL runtime (requires a `DATABASE_URL`).
+- [x] Scaffold do projeto com Next.js + React + TypeScript strict + Tailwind.
+- [x] Migração de esquema PostgreSQL e definição de seed fictício e realista.
+- [x] Autenticação com cookies assinados, validação com Zod, contexto de organização e perfis de acesso (roles).
+- [x] Limite de repositório com escopo de tenant e testes de proteção contra acesso entre organizações (cross-tenant).
+- [x] Layout principal responsivo, tokens de design e dashboard calculado a partir dos dados do repositório de demonstração.
+- [ ] Substituir o adaptador de demonstração pelo runtime PostgreSQL local ou gerenciado (requer uma `DATABASE_URL`).
 
-## Phase 2 — Records (in progress)
+## Fase 2 — Cadastros e Prontuários (concluída)
 
-- [x] Patient search, create, edit and activate/inactivate actions.
-- [x] Professional, specialty, service and room catalogs with tenant-scoped server validation and creation.
-- [x] Responsive empty, success and validation/error states.
-- [ ] Complete edit/activate/inactivate controls for the operational catalogs.
-- [ ] Persist Phase 2 writes through the configured PostgreSQL adapter.
+- [x] Busca, criação, edição e ativação/inativação de pacientes.
+- [x] Catálogos de profissionais, especialidades, serviços e salas com criação e validações no servidor com escopo de tenant.
+- [x] Estados responsivos para listas vazias, sucesso e validações/erros.
+- [x] Completar os controles de edição/ativação/inativação para os catálogos operacionais.
+- [ ] Persistir as gravações da Fase 2 através do adaptador PostgreSQL configurado.
 
-## Phase 3 — Scheduling (in progress)
+## Fase 3 — Agendamento (em andamento)
 
-- [x] Day agenda with tenant-scoped creation, confirmation and cancellation.
-- [x] Service-layer collision detection for both professional and room.
-- [ ] Recurring availability, schedule blocks, rescheduling, week/month views and database exclusion constraints.
+- [x] Agenda diária com criação, confirmação e cancelamento com escopo de tenant.
+- [x] Detecção de conflito de horários na camada de serviço tanto para o profissional quanto para a sala.
+- [x] Reagendamento de consultas com validação de colisão de profissional e sala.
+- [ ] Disponibilidade recorrente, bloqueios de agenda, visualizações por semana/mês e restrições de exclusão no banco de dados.
 
-## Phase 4 — Finance
+## Fase 4 — Financeiro (concluída)
 
-Payments, expenses, transaction projection and date-filtered dashboard charts.
+- [x] Resumo de fluxo de caixa: total recebido, pendente, despesas operacionais e saldo líquido.
+- [x] Listagem, detalhamento e confirmação/baixa de recebimentos de consultas na recepção.
+- [x] Cadastro e acompanhamento de despesas operacionais da clínica por categoria e vencimento.
+- [x] Rota protegida `/finance` com layout dedicado e link integrado na barra de navegação.
+- [x] Testes automatizados com Vitest cobrindo cálculos, regras de tenant e autorização por papéis.
 
-## Phase 5 — Messages
 
-Conversation inbox, messages, templates and a clearly isolated Mock WhatsApp provider.
+## Fase 5 — Mensagens
 
-## Phase 6 — AI
+Caixa de entrada de conversas, mensagens, modelos (templates) e um provedor mock isolado do WhatsApp.
 
-Administrative-only agent, typed tool layer, no direct database access, medical guardrails and human handoff.
+## Fase 6 — Inteligência Artificial
 
-## Phase 7 — Automations
+Agente estritamente administrativo, camada de ferramentas tipadas (typed tools), sem acesso direto ao banco de dados, diretrizes de segurança médica e transição para atendimento humano (human handoff).
 
-Scheduled confirmations/reminders, execution records, idempotency and bounded retries.
+## Fase 7 — Automações
 
-## Phase 8 — Reports
+Confirmações e lembretes agendados, histórico de execuções, idempotência e tentativas com limite (bounded retries).
 
-Operational, scheduling and financial reporting with permission-aware access.
+## Fase 8 — Relatórios
 
-## Phase 9–10 — Quality and polish
+Relatórios operacionais, de agendamento e financeiros com controle de acesso baseado em permissões.
 
-Full end-to-end security/tenant tests, accessibility and responsive checks, observability, error treatment and release readiness.
+## Fases 9–10 — Qualidade e Acabamento
+
+Testes completos de segurança e isolamento de ponta a ponta, verificações de acessibilidade e responsividade, observabilidade, tratamento de erros e prontidão para lançamento.

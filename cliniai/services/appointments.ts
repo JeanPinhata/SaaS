@@ -22,3 +22,45 @@ export async function createAppointment(context: OrganizationContext, input: { p
 }
 
 export async function updateAppointmentStatus(context: OrganizationContext, id: string, status: AppointmentStatus) { const appointment = recordById(demoDatabase.appointments, id, context); if (!appointment) throw new Error("Consulta não encontrada."); appointment.status = status; return appointment; }
+
+export async function rescheduleAppointment(
+  context: OrganizationContext,
+  appointmentId: string,
+  input: { date: string; time: string; roomId?: string }
+) {
+  const appointment = recordById(demoDatabase.appointments, appointmentId, context);
+  if (!appointment) throw new Error("Consulta não encontrada.");
+  if (["CANCELLED", "COMPLETED", "NO_SHOW"].includes(appointment.status)) {
+    throw new Error("Não é possível reagendar uma consulta finalizada ou cancelada.");
+  }
+
+  const service = appointment.serviceId
+    ? recordById(demoDatabase.services, appointment.serviceId, context)
+    : demoDatabase.services[0];
+  const duration = service?.durationMinutes ?? 30;
+
+  const targetRoomId = input.roomId ?? appointment.roomId ?? demoDatabase.rooms[0]?.id;
+  const startsAt = `${input.date}T${input.time}:00-03:00`;
+  const start = new Date(startsAt);
+  const endsAt = new Date(start.getTime() + duration * 60_000).toISOString();
+
+  const conflict = demoDatabase.appointments.some(
+    (other) =>
+      other.id !== appointment.id &&
+      other.organizationId === context.organizationId &&
+      active(other.status) &&
+      (other.professionalId === appointment.professionalId || other.roomId === targetRoomId) &&
+      start < new Date(other.endsAt ?? other.startsAt) &&
+      new Date(other.startsAt) < new Date(endsAt)
+  );
+
+  if (conflict) throw new Error("Este novo horário conflita com a agenda do profissional ou da sala.");
+
+  appointment.startsAt = startsAt;
+  appointment.endsAt = endsAt;
+  if (input.roomId) appointment.roomId = input.roomId;
+  appointment.status = "SCHEDULED";
+
+  return appointment;
+}
+

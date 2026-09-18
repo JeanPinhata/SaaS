@@ -50,3 +50,36 @@ export type DashboardData = {
   waitingListCount: number;
   weeklyRevenue: Array<{ label: string; value: number }>;
 };
+
+export type PaymentStatus = "PAID" | "PENDING" | "CANCELLED" | "REFUNDED";
+
+export type Payment = TenantRecord & {
+  id: string;
+  patientId: string;
+  patientName: string;
+  appointmentId?: string;
+  amount: number;
+  status: PaymentStatus;
+  paymentMethod: string;
+  paidAt?: string;
+  createdAt: string;
+  notes?: string;
+};
+
+export type Expense = TenantRecord & {
+  id: string;
+  description: string;
+  category: string;
+  amount: number;
+  dueDate: string;
+  paidAt?: string;
+  createdAt: string;
+};
+
+export type FinancialSummary = {
+  totalReceived: number;
+  totalPending: number;
+  totalExpenses: number;
+  netBalance: number;
+};
+
