@@ -52,9 +52,16 @@ Agente estritamente administrativo, camada de ferramentas tipadas (typed tools),
 
 Confirmações e lembretes agendados, histórico de execuções, idempotência e tentativas com limite (bounded retries).
 
-## Fase 8 — Relatórios
+## Fase 8 — Relatórios e Inteligência de Dados (concluída)
 
-Relatórios operacionais, de agendamento e financeiros com controle de acesso baseado em permissões.
+- [x] Modelagem probabilística de No-Show com classificação de risco e estimativa de impacto financeiro.
+- [x] Motor de recomendações prescritivas da IA para intervenção ativa via WhatsApp e listas de espera.
+- [x] Mapa de calor 2D de ocupação semanal (horários de pico e janelas de ociosidade operacional).
+- [x] Projeção de faturamento (+30 dias) via regressão linear univariada com bandas de confiança estatística de 95%.
+- [x] Curva de Pareto (análise ABC 80/20) de serviços e procedimentos da clínica.
+- [x] Distribuição demográfica (pirâmide etária) e market share de convênios vs particular.
+- [x] Exportação para arquivo CSV e suporte completo à impressão executiva limpa / PDF.
+- [x] Rota protegida `/reports`, layout dedicado, link na barra lateral e suíte de testes unitários com Vitest.
 
 ## Fases 9–10 — Qualidade e Acabamento
 

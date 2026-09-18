@@ -1,7 +1,7 @@
 import { Bell, Bot, CalendarDays, ChartNoAxesCombined, ChevronDown, CircleDollarSign, HeartPulse, LayoutDashboard, MessageCircle, Settings, Stethoscope, UsersRound } from "lucide-react";
 import { signOutAction } from "@/app/dashboard/actions";
 
-const navigation = [["Dashboard", "/dashboard", LayoutDashboard], ["Agenda", "/agenda", CalendarDays], ["Pacientes", "/patients", UsersRound], ["Profissionais", "/professionals", Stethoscope], ["Financeiro", "/finance", CircleDollarSign], ["WhatsApp / IA", "#fase-6", Bot], ["Mensagens", "#fase-5", MessageCircle], ["Relatórios", "#fase-8", ChartNoAxesCombined], ["Configurações", "#fase-7", Settings]] as const;
+const navigation = [["Dashboard", "/dashboard", LayoutDashboard], ["Agenda", "/agenda", CalendarDays], ["Pacientes", "/patients", UsersRound], ["Profissionais", "/professionals", Stethoscope], ["Financeiro", "/finance", CircleDollarSign], ["WhatsApp / IA", "#fase-6", Bot], ["Mensagens", "#fase-5", MessageCircle], ["Relatórios", "/reports", ChartNoAxesCombined], ["Configurações", "#fase-7", Settings]] as const;
 
 
 function getInitials(name: string): string {

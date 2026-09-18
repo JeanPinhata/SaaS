@@ -85,3 +85,70 @@ export type FinancialSummary = {
   netBalance: number;
 };
 
+export type PeriodFilter = "7d" | "30d" | "90d" | "12m";
+
+export type PredictiveNoShowMetrics = {
+  overallRiskRate: number;
+  riskLevel: "LOW" | "MODERATE" | "HIGH";
+  estimatedRevenueLoss: number;
+  confirmedAppointments: number;
+  noShowAppointments: number;
+  totalAppointments: number;
+  topRiskFactors: Array<{ factor: string; impact: string; weight: number }>;
+  prescriptiveRecommendation: string;
+};
+
+export type HeatmapCell = {
+  dayOfWeek: number;
+  hour: number;
+  occupancyRate: number;
+  appointmentCount: number;
+};
+
+export type OccupancyHeatmap = {
+  hours: number[];
+  days: string[];
+  cells: HeatmapCell[];
+  peakHour: string;
+  lowestHour: string;
+  averageOccupancy: number;
+};
+
+export type RevenueForecastPoint = {
+  date: string;
+  actual?: number;
+  forecast?: number;
+  lowerBound?: number;
+  upperBound?: number;
+};
+
+export type ParetoItem = {
+  name: string;
+  revenue: number;
+  percentage: number;
+  cumulativePercentage: number;
+};
+
+export type DemographicDistribution = {
+  ageGroups: Array<{ label: string; count: number; percentage: number }>;
+  insurances: Array<{ name: string; count: number; percentage: number }>;
+};
+
+export type ClinicalAnalyticsSummary = {
+  period: PeriodFilter;
+  generatedAt: string;
+  organizationName: string;
+  totalRevenue: number;
+  projectedRevenue: number;
+  revenueGrowthRate: number;
+  patientLtv: number;
+  patientRetentionRate: number;
+  activePatientCount: number;
+  noShowMetrics: PredictiveNoShowMetrics;
+  occupancyHeatmap: OccupancyHeatmap;
+  revenueForecast: RevenueForecastPoint[];
+  paretoServices: ParetoItem[];
+  demographics: DemographicDistribution;
+};
+
+
