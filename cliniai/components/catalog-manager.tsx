@@ -37,12 +37,20 @@ function CatalogForm({ section, specialties, record, onClose }: { section: Secti
         <>
           <label>Nome completo<input name="name" defaultValue={prof?.name} required placeholder="Dra. Marina Costa" /></label>
           <label>Especialidade
-            <select name="specialtyId" required defaultValue={prof?.specialtyId ?? ""}>
-              <option value="" disabled>Selecione</option>
-              {specialties.filter((item) => item.status === "ACTIVE" || item.id === prof?.specialtyId).map((item) => (
-                <option value={item.id} key={item.id}>{item.name}</option>
+            <input
+              name="specialty"
+              type="text"
+              defaultValue={prof?.specialtyId ? (specialties.find((item) => item.id === prof.specialtyId)?.name ?? "") : ""}
+              required
+              placeholder="Ex.: Cardiologia, Pediatria..."
+              list="specialty-suggestions"
+              autoComplete="off"
+            />
+            <datalist id="specialty-suggestions">
+              {specialties.map((item) => (
+                <option key={item.id} value={item.name} />
               ))}
-            </select>
+            </datalist>
           </label>
           <label>Registro profissional<input name="registration" defaultValue={prof?.registration} required placeholder="CRM-SP 000000" /></label>
           <label>Telefone<input name="phone" defaultValue={prof?.phone} required placeholder="(11) 99999-0000" /></label>

@@ -219,7 +219,52 @@ export async function saveRoom(context: Context, input: Omit<Room, "id" | "organ
   return saveRecord(demoDatabase.rooms, context, input);
 }
 
-export async function saveProfessional(context: Context, input: Omit<Professional, "id" | "organizationId" | "status"> & { id?: string }) {
+export async function saveProfessional(
+  context: Context,
+  input: Omit<Professional, "id" | "organizationId" | "status" | "specialtyId"> & {
+    id?: string;
+    specialtyId?: string;
+    specialty?: string;
+  }
+) {
+  let finalSpecialtyId = input.specialtyId;
+
+  if (input.specialty && input.specialty.trim()) {
+    const specName = input.specialty.trim();
+    const pool = getDbPool();
+    if (pool) {
+      try {
+        const found = await pool.query(
+          `SELECT id FROM specialties WHERE organization_id = $1 AND LOWER(name) = LOWER($2) LIMIT 1`,
+          [toUUID(context.organizationId), specName]
+        );
+        if (found.rows.length > 0) {
+          finalSpecialtyId = found.rows[0].id;
+        }
+      } catch (e) {
+        console.warn("DB find specialty query fallback:", e);
+      }
+    }
+
+    if (!finalSpecialtyId) {
+      const foundInDemo = demoDatabase.specialties.find(
+        (s) => s.organizationId === context.organizationId && s.name.toLowerCase() === specName.toLowerCase()
+      );
+      if (foundInDemo) {
+        finalSpecialtyId = foundInDemo.id;
+      }
+    }
+
+    if (!finalSpecialtyId) {
+      const created = await saveSpecialty(context, { name: specName });
+      finalSpecialtyId = created.id;
+    }
+  }
+
+  if (!finalSpecialtyId) {
+    throw new Error("Especialidade obrigatória.");
+  }
+
   const pool = getDbPool();
   const id = input.id ? toUUID(input.id) : toUUID(randomUUID());
   if (pool) {
@@ -227,11 +272,11 @@ export async function saveProfessional(context: Context, input: Omit<Professiona
       await pool.query(
         `INSERT INTO professionals (id, organization_id, specialty_id, name, professional_registration, phone, email, status)
          VALUES ($1, $2, $3, $4, $5, $6, $7, 'ACTIVE')
-         ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, phone = EXCLUDED.phone, email = EXCLUDED.email`,
+         ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, specialty_id = EXCLUDED.specialty_id, phone = EXCLUDED.phone, email = EXCLUDED.email`,
         [
           id,
           toUUID(context.organizationId),
-          toUUID(input.specialtyId),
+          toUUID(finalSpecialtyId),
           input.name,
           input.registration,
           input.phone,
@@ -242,9 +287,25 @@ export async function saveProfessional(context: Context, input: Omit<Professiona
       console.warn("DB saveProfessional fallback:", e);
     }
   }
-  if (!byId(demoDatabase.specialties, input.specialtyId, context)) throw new Error("Especialidade inválida.");
-  return saveRecord(demoDatabase.professionals, context, input);
+
+  let specInDemo = demoDatabase.specialties.find((s) => s.id === finalSpecialtyId);
+  if (!specInDemo && input.specialty) {
+    specInDemo = {
+      id: finalSpecialtyId,
+      organizationId: context.organizationId,
+      name: input.specialty.trim(),
+      status: "ACTIVE",
+    };
+    demoDatabase.specialties.push(specInDemo);
+  }
+
+  const { specialty: _specialtyText, ...professionalData } = input;
+  return saveRecord(demoDatabase.professionals, context, {
+    ...professionalData,
+    specialtyId: finalSpecialtyId,
+  });
 }
+
 
 export async function updateRecordStatus(
   context: Context,
