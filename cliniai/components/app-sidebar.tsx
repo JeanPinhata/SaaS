@@ -1,4 +1,4 @@
-import { Bell, Bot, CalendarDays, ChartNoAxesCombined, ChevronDown, CircleDollarSign, HeartPulse, LayoutDashboard, MessageCircle, Settings, Stethoscope, UsersRound } from "lucide-react";
+import { Bot, CalendarDays, ChartNoAxesCombined, ChevronDown, CircleDollarSign, HeartPulse, LayoutDashboard, LogOut, MessageCircle, Settings, Stethoscope, UsersRound } from "lucide-react";
 import { signOutAction } from "@/app/dashboard/actions";
 
 const navigation = [["Dashboard", "/dashboard", LayoutDashboard], ["Agenda", "/agenda", CalendarDays], ["Pacientes", "/patients", UsersRound], ["Profissionais", "/professionals", Stethoscope], ["Financeiro", "/finance", CircleDollarSign], ["WhatsApp / IA", "#fase-6", Bot], ["Mensagens", "#fase-5", MessageCircle], ["Relatórios", "/reports", ChartNoAxesCombined], ["Configurações", "#fase-7", Settings]] as const;
@@ -29,6 +29,16 @@ export function AppSidebar({
         <div className="sidebar-brand">
           <span className="brand-mark"><HeartPulse size={18} /></span>
           <strong>CliniAI</strong>
+          <form action={signOutAction} className="mobile-signout">
+            <button
+              type="submit"
+              aria-label="Sair da conta"
+              title="Sair da conta"
+              className="mobile-signout-btn"
+            >
+              <LogOut size={16} />
+            </button>
+          </form>
         </div>
         <nav aria-label="Navegação principal" className="sidebar-nav">
           {navigation.map(([label, href, Icon]) => (
@@ -61,7 +71,15 @@ export function AppSidebar({
             <small>{userRole}</small>
           </span>
           <form action={signOutAction}>
-            <button aria-label="Sair da conta" title="Sair"><Bell size={16} /></button>
+            <button
+              type="submit"
+              aria-label="Sair da conta"
+              title="Sair da conta"
+              className="signout-button"
+            >
+              <LogOut size={15} />
+              <span>Sair</span>
+            </button>
           </form>
         </div>
       </div>
