@@ -2,6 +2,7 @@ services:
   - type: web
     name: cliniai
     env: node
+    plan: free
     rootDir: cliniai
     buildCommand: npm install && npm run build
     startCommand: npm run start
